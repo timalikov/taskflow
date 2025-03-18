@@ -1,7 +1,10 @@
 package com.example.TaskFlow.services;
 
-import com.example.TaskFlow.dtos.requests.TaskRequest;
-import com.example.TaskFlow.dtos.responses.TaskResponse;
+import com.example.TaskFlow.dtos.requests.CreateTaskRequest;
+import com.example.TaskFlow.dtos.requests.UpdateTaskRequest;
+import com.example.TaskFlow.dtos.responses.CreateTaskResponse;
+import com.example.TaskFlow.dtos.responses.GetTaskResponse;
+import com.example.TaskFlow.dtos.responses.UpdateTaskResponse;
 import com.example.TaskFlow.entities.Task;
 import com.example.TaskFlow.exceptions.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
@@ -10,42 +13,35 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TaskService {
     private Long id = 0L;
     private Map<Long, Task> tasks = new HashMap<>();
 
-    public TaskResponse createTask(TaskRequest request) {
+    public CreateTaskResponse createTask(CreateTaskRequest request) {
         Task task = new Task();
         task.setId(id);
         task.setTitle(request.title());
         task.setDescription(request.description());
         tasks.put(id, task);
         id++;
-        return TaskResponse.fromEntity(task);
+        return CreateTaskResponse.fromEntity(task);
     }
 
-    public List<TaskResponse> getAllTasks() {
+    public List<GetTaskResponse> getAllTasks() {
         return tasks.values().stream()
-                .map(TaskResponse::fromEntity)
+                .map(GetTaskResponse::fromEntity)
                 .toList();
     }
 
-    public TaskResponse getTaskById(Long id) {
-        Task task = tasks.get(id);
-        if (task == null) {
-            throw new ResourceNotFoundException("Task with id: " + id + " not found");
-        }
-        return TaskResponse.fromEntity(task);
+    public GetTaskResponse getTaskById(Long id) {
+        return GetTaskResponse.fromEntity(getTaskOrThrow(id));
     }
 
-    public TaskResponse updateTask(Long id, TaskRequest request) {
-        Task task = tasks.get(id);
-
-        if (task == null) {
-            throw new ResourceNotFoundException("Task with ID " + id + " not found");
-        }
+    public UpdateTaskResponse updateTask(Long id, UpdateTaskRequest request) {
+        Task task = getTaskOrThrow(id);
 
         if (request.title() != null) task.setTitle(request.title());
         if (request.description() != null) task.setDescription(request.description());
@@ -55,14 +51,16 @@ public class TaskService {
             task.setUpdatedAt(LocalDateTime.now());
         }
 
-        return TaskResponse.fromEntity(task);
+        return UpdateTaskResponse.fromEntity(task);
     }
 
-    public boolean deleteTask(Long id) {
-        if (tasks.get(id) == null) {
-            throw new ResourceNotFoundException("Task with id: " + id + " not found");
-        }
-        tasks.remove(id);
-        return true;
+    public void deleteTask(Long id) {
+        tasks.remove(getTaskOrThrow(id).getId());
     }
+
+    private Task getTaskOrThrow(Long id) {
+        return Optional.ofNullable(tasks.get(id))
+                .orElseThrow(() -> new ResourceNotFoundException("Task with ID " + id + " not found"));
+    }
+
 }
