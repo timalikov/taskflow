@@ -14,22 +14,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRespository userRespository;
 
+    @Transactional(readOnly = true)
     @Override
     public Page<GetUserResponse> getAllUsers(Pageable pageable) {
         return userRespository.findAll(pageable).map(GetUserResponse::fromEntity);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public GetUserResponse getUserById(Long id) {
         return GetUserResponse.fromEntity(EntityUtils.getByIdOrThrow(userRespository, id, "User"));
     }
 
+    @Transactional
     @Override
     public CreateUserResponse createUser(CreateUserRequest request) {
         User user = new User();
@@ -41,6 +45,7 @@ public class UserServiceImpl implements UserService {
         return CreateUserResponse.fromEntity(userRespository.save(user));
     }
 
+    @Transactional
     @Override
     public UpdateUserResponse updateUser(Long id, UpdateUserRequest request) {
         User user = EntityUtils.getByIdOrThrow(userRespository, id, "User");
