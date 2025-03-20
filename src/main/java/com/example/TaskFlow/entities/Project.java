@@ -1,47 +1,45 @@
 package com.example.TaskFlow.entities;
 
-import com.example.TaskFlow.enums.Priority;
-import com.example.TaskFlow.enums.TaskStatus;
+import com.example.TaskFlow.enums.ProjectStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "projects")
 @Getter
 @Setter
-public class Task {
+public class Project {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
 
-    @Column(name = "title", nullable = false)
-    private String title;
+    @Column(name = "name", nullable = false)
+    private String name;
 
     @Column(name = "description")
     private String description;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private TaskStatus status = TaskStatus.TODO;
+    private ProjectStatus status = ProjectStatus.ACTIVE;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "priority")
-    private Priority priority;
-
-    @Column(name = "deadline")
-    private LocalDateTime deadline;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id", nullable = false)
-    private Project project;
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "user_projects",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> users;
 
     @PastOrPresent(message = "Creation date cannot be in the future")
     @Column(name = "created_at", updatable = false)
@@ -60,4 +58,13 @@ public class Task {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    public Set<Long> getUserIds() {
+        Set<Long> userIds = new HashSet<>();
+        for (User user : users) {
+            userIds.add(user.getId());
+        }
+        return userIds;
+    }
 }
+
