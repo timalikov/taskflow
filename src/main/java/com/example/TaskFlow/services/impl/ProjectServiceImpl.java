@@ -2,9 +2,6 @@ package com.example.TaskFlow.services.impl;
 
 import com.example.TaskFlow.dtos.requests.projects.CreateProjectRequest;
 import com.example.TaskFlow.dtos.requests.projects.UpdateProjectRequest;
-import com.example.TaskFlow.dtos.responses.projects.CreateProjectResponse;
-import com.example.TaskFlow.dtos.responses.projects.GetProjectResponse;
-import com.example.TaskFlow.dtos.responses.projects.UpdateProjectResponse;
 import com.example.TaskFlow.entities.Project;
 import com.example.TaskFlow.entities.User;
 import com.example.TaskFlow.repositories.ProjectRepository;
@@ -28,20 +25,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<GetProjectResponse> getAllProjects(Pageable pageable) {
-        return projectRepository.findAll(pageable).map(GetProjectResponse::fromEntity);
+    public Page<Project> getAllProjects(Pageable pageable) {
+        return projectRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public GetProjectResponse getProjectById(Long id) {
-        Project project = EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
-        return GetProjectResponse.fromEntity(project);
+    public Project getProjectById(Long id) {
+        return EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
     }
 
     @Transactional
     @Override
-    public CreateProjectResponse createProject(CreateProjectRequest request) {
+    public Project createProject(CreateProjectRequest request) {
         Set<User> users = new HashSet<>();
         for (Long id : request.userIds()) {
             User user = EntityUtils.getByIdOrThrow(userRespository, id, "User");
@@ -52,12 +48,12 @@ public class ProjectServiceImpl implements ProjectService {
         project.setDescription(request.description());
         project.setUsers(users);
 
-        return CreateProjectResponse.fromEntity(projectRepository.save(project));
+        return projectRepository.save(project);
     }
 
     @Transactional
     @Override
-    public UpdateProjectResponse updateProject(Long id, UpdateProjectRequest request) {
+    public Project updateProject(Long id, UpdateProjectRequest request) {
         Project project = EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
         Set<User> users = new HashSet<>();
 
@@ -72,7 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (request.name() != null) project.setName(request.name());
         if (request.description() != null) project.setDescription(request.description());
 
-        return UpdateProjectResponse.fromEntity(projectRepository.save(project));
+        return projectRepository.save(project);
     }
 
     @Override

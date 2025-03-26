@@ -23,38 +23,38 @@ public class UserServiceImpl implements UserService {
 
     @Transactional(readOnly = true)
     @Override
-    public Page<GetUserResponse> getAllUsers(Pageable pageable) {
-        return userRespository.findAll(pageable).map(GetUserResponse::fromEntity);
+    public Page<User> getAllUsers(Pageable pageable) {
+        return userRespository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public GetUserResponse getUserById(Long id) {
-        return GetUserResponse.fromEntity(EntityUtils.getByIdOrThrow(userRespository, id, "User"));
+    public User getUserById(Long id) {
+        return EntityUtils.getByIdOrThrow(userRespository, id, "User");
     }
 
     @Transactional
     @Override
-    public CreateUserResponse createUser(CreateUserRequest request) {
+    public User createUser(CreateUserRequest request) {
         User user = new User();
 
         user.setFirstName(request.firstName());
         user.setLastName(request.lastName());
         user.setEmail(request.email());
 
-        return CreateUserResponse.fromEntity(userRespository.save(user));
+        return userRespository.save(user);
     }
 
     @Transactional
     @Override
-    public UpdateUserResponse updateUser(Long id, UpdateUserRequest request) {
+    public User updateUser(Long id, UpdateUserRequest request) {
         User user = EntityUtils.getByIdOrThrow(userRespository, id, "User");
 
         if (request.firstName() != null) user.setFirstName(request.firstName());
         if (request.lastName() != null) user.setLastName(request.lastName());
         if (request.email() != null) user.setEmail(request.email());
 
-        return UpdateUserResponse.fromEntity(userRespository.save(user));
+        return userRespository.save(user);
     }
 
     @Override

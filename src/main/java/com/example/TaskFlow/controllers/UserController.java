@@ -24,23 +24,33 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<GetUserResponse>> getAllUsers(
-            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(userService.getAllUsers(pageable));
+            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                userService.getAllUsers(pageable)
+                        .map(GetUserResponse::fromEntity)
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GetUserResponse> getUserById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+        return ResponseEntity.ok(
+                GetUserResponse.fromEntity(userService.getUserById(id))
+        );
     }
 
     @PostMapping
     public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                CreateUserResponse.fromEntity(userService.createUser(request))
+        );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UpdateUserResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userService.updateUser(id, request));
+        return ResponseEntity.ok(
+                UpdateUserResponse.fromEntity(userService.updateUser(id, request))
+        );
     }
 
     @DeleteMapping("/{id}")

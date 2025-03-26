@@ -26,23 +26,33 @@ public class TaskController {
 
     @PostMapping
     public ResponseEntity<CreateTaskResponse> createTask(@Valid @RequestBody CreateTaskRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(taskService.createTask(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                CreateTaskResponse.fromEntity(taskService.createTask(request))
+        );
     }
 
     @GetMapping
     public ResponseEntity<Page<GetTaskResponse>> getAllTasks(
-            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(taskService.getAllTasks(pageable));
+            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                taskService.getAllTasks(pageable)
+                        .map(GetTaskResponse::fromEntity)
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GetTaskResponse> getTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok(taskService.getTaskById(id));
+        return ResponseEntity.ok(
+                GetTaskResponse.fromEntity(taskService.getTaskById(id))
+        );
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UpdateTaskResponse> updateTask(@PathVariable Long id, @Valid @RequestBody UpdateTaskRequest request) {
-        return ResponseEntity.ok(taskService.updateTask(id, request));
+        return ResponseEntity.ok(
+                UpdateTaskResponse.fromEntity(taskService.updateTask(id, request))
+        );
     }
 
     @DeleteMapping("/{id}")
