@@ -17,18 +17,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.net.URI;
+
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 public class ProjectController {
     private final ProjectService projectService;
 
     @GetMapping
-    public ResponseEntity<Page<GetProjectResponse>> getAllProjects(
-            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(
-                projectService.getAllProjects(pageable)
+    public ResponseEntity<Page<GetProjectResponse>> getAllProjects(Pageable pageable) {
+        return ResponseEntity.ok(projectService.getAllProjects(pageable)
                         .map(GetProjectResponse::fromEntity)
         );
     }
@@ -42,13 +41,19 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<CreateProjectResponse> createProject(@Valid @RequestBody CreateProjectRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                CreateProjectResponse.fromEntity(projectService.createProject(request))
+        var response = projectService.createProject(request);
+        var location = URI.create("/api/projects/%d".formatted(response.getId()));
+
+        return ResponseEntity.created(location).body(
+                CreateProjectResponse.fromEntity(response)
         );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UpdateProjectResponse> updateProject(@PathVariable Long id, @Valid @RequestBody UpdateProjectRequest request) {
+    public ResponseEntity<UpdateProjectResponse> updateProject(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateProjectRequest request)
+    {
         return ResponseEntity.ok(
                 UpdateProjectResponse.fromEntity(projectService.updateProject(id, request))
         );

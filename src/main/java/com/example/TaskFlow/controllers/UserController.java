@@ -16,18 +16,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
+
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<Page<GetUserResponse>> getAllUsers(
-            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(
-                userService.getAllUsers(pageable)
+    public ResponseEntity<Page<GetUserResponse>> getAllUsers(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAllUsers(pageable)
                         .map(GetUserResponse::fromEntity)
         );
     }
@@ -41,7 +40,10 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<CreateUserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
+        var response = userService.createUser(request);
+        var location = URI.create("/api/users/%d".formatted(response.getId()));
+
+        return ResponseEntity.created(location).body(
                 CreateUserResponse.fromEntity(userService.createUser(request))
         );
     }

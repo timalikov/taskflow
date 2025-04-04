@@ -7,7 +7,8 @@ import com.example.TaskFlow.entities.User;
 import com.example.TaskFlow.repositories.ProjectRepository;
 import com.example.TaskFlow.repositories.UserRespository;
 import com.example.TaskFlow.services.ProjectService;
-import com.example.TaskFlow.shared.EntityUtils;
+import com.example.TaskFlow.utils.EntityUtils;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,15 +36,15 @@ public class ProjectServiceImpl implements ProjectService {
         return EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
     }
 
-    @Transactional
     @Override
     public Project createProject(CreateProjectRequest request) {
         Set<User> users = new HashSet<>();
-        for (Long id : request.userIds()) {
-            User user = EntityUtils.getByIdOrThrow(userRespository, id, "User");
+        for (var id : request.userIds()) {
+            var user = EntityUtils.getByIdOrThrow(userRespository, id, "User");
             users.add(user);
         }
-        Project project = new Project();
+
+        var project = new Project();
         project.setName(request.name());
         project.setDescription(request.description());
         project.setUsers(users);
@@ -51,15 +52,14 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(project);
     }
 
-    @Transactional
     @Override
     public Project updateProject(Long id, UpdateProjectRequest request) {
-        Project project = EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
+        var project = EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
         Set<User> users = new HashSet<>();
 
         if (request.userIds() != null) {
-            for (Long userId : request.userIds()) {
-                User user = EntityUtils.getByIdOrThrow(userRespository, userId, "User");
+            for (var userId : request.userIds()) {
+                var user = EntityUtils.getByIdOrThrow(userRespository, userId, "User");
                 users.add(user);
             }
             project.setUsers(users);
@@ -73,7 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteProject(Long id) {
-        Project project = EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
+        var project = EntityUtils.getByIdOrThrow(projectRepository, id, "Project");
         projectRepository.delete(project);
     }
 }

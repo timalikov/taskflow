@@ -3,7 +3,6 @@ package com.example.TaskFlow.entities;
 import com.example.TaskFlow.enums.Priority;
 import com.example.TaskFlow.enums.TaskStatus;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +12,7 @@ import java.time.LocalDateTime;
 @Table(name = "tasks")
 @Getter
 @Setter
-public class Task {
+public class Task extends BaseEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
     private Long id;
@@ -42,22 +41,4 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
-
-    @PastOrPresent(message = "Creation date cannot be in the future")
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @PastOrPresent(message = "Updated date cannot be in the future")
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

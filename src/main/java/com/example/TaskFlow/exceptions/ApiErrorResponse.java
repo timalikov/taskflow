@@ -1,7 +1,10 @@
 package com.example.TaskFlow.exceptions;
 
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
+@Getter
 public class ApiErrorResponse {
     private int status;
     private String message;

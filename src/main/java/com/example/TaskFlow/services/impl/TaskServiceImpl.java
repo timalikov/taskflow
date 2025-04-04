@@ -2,14 +2,12 @@ package com.example.TaskFlow.services.impl;
 
 import com.example.TaskFlow.dtos.requests.tasks.CreateTaskRequest;
 import com.example.TaskFlow.dtos.requests.tasks.UpdateTaskRequest;
-import com.example.TaskFlow.entities.Project;
 import com.example.TaskFlow.entities.Task;
-import com.example.TaskFlow.entities.User;
 import com.example.TaskFlow.repositories.ProjectRepository;
 import com.example.TaskFlow.repositories.TaskRepository;
 import com.example.TaskFlow.repositories.UserRespository;
 import com.example.TaskFlow.services.TaskService;
-import com.example.TaskFlow.shared.EntityUtils;
+import com.example.TaskFlow.utils.EntityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,13 +21,12 @@ public class TaskServiceImpl implements TaskService {
     private final UserRespository userRespository;
     private final ProjectRepository projectRepository;
 
-    @Transactional
     @Override
     public Task createTask(CreateTaskRequest request) {
-        User user = EntityUtils.getByIdOrThrow(userRespository, request.userId(), "User");
-        Project project = EntityUtils.getByIdOrThrow(projectRepository, request.projectId(), "Project");
+        var user = EntityUtils.getByIdOrThrow(userRespository, request.userId(), "User");
+        var project = EntityUtils.getByIdOrThrow(projectRepository, request.projectId(), "Project");
 
-        Task task = new Task();
+        var task = new Task();
         task.setTitle(request.title());
         task.setDescription(request.description());
         task.setPriority(request.priority());
@@ -51,10 +48,9 @@ public class TaskServiceImpl implements TaskService {
         return EntityUtils.getByIdOrThrow(taskRepository, id, "Task");
     }
 
-    @Transactional
     @Override
     public Task updateTask(Long id, UpdateTaskRequest request) {
-        Task task = EntityUtils.getByIdOrThrow(taskRepository, id, "Task");
+        var task = EntityUtils.getByIdOrThrow(taskRepository, id, "Task");
 
         if (request.title() != null) task.setTitle(request.title());
         if (request.description() != null) task.setDescription(request.description());
