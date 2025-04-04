@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/task-history")
+@RequestMapping("/api/task-history")
 @RequiredArgsConstructor
 public class TaskHistoryController {
     private final TaskHistoryService taskHistoryService;

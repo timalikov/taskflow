@@ -10,6 +10,13 @@ spring:
     password: 1234
     driver-class-name: org.postgresql.Driver
 
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -32,3 +39,15 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+app:
+  default:
+    page-size: 10
+    start-page: 0
+    sort-field: id
+
+  upload:
+    allowed-file-types:
+      - application/pdf
+      - image/png
+      - image/jpeg
+      - image/jpg

@@ -13,7 +13,6 @@ import java.util.List;
 public class LogEntryServiceImpl implements LogEntryService {
     private final LogEntryRepository logEntryRepository;
 
-
     @Override
     public List<LogEntry> getAllLogEntries() {
         return logEntryRepository.findAll();

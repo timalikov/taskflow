@@ -17,42 +17,41 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
+import java.net.URI;
+
 
 @RestController
-@RequestMapping("/tasks")
+@RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
 
     @PostMapping
     public ResponseEntity<CreateTaskResponse> createTask(@Valid @RequestBody CreateTaskRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                CreateTaskResponse.fromEntity(taskService.createTask(request))
-        );
+        var response = taskService.createTask(request);
+        var location = URI.create("/api/tasks/%d".formatted(response.getId()));
+
+        return ResponseEntity.created(location)
+                .body(CreateTaskResponse.fromEntity(response));
     }
 
     @GetMapping
-    public ResponseEntity<Page<GetTaskResponse>> getAllTasks(
-            @PageableDefault(size = 10, page = 0, sort = "id", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        return ResponseEntity.ok(
-                taskService.getAllTasks(pageable)
-                        .map(GetTaskResponse::fromEntity)
-        );
+    public ResponseEntity<Page<GetTaskResponse>> getAllTasks(Pageable pageable) {
+        return ResponseEntity.ok(taskService.getAllTasks(pageable)
+                .map(GetTaskResponse::fromEntity));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GetTaskResponse> getTaskById(@PathVariable Long id) {
-        return ResponseEntity.ok(
-                GetTaskResponse.fromEntity(taskService.getTaskById(id))
-        );
+        return ResponseEntity.ok(GetTaskResponse.fromEntity(taskService.getTaskById(id)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UpdateTaskResponse> updateTask(@PathVariable Long id, @Valid @RequestBody UpdateTaskRequest request) {
-        return ResponseEntity.ok(
-                UpdateTaskResponse.fromEntity(taskService.updateTask(id, request))
-        );
+    public ResponseEntity<UpdateTaskResponse> updateTask(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateTaskRequest request)
+    {
+        return ResponseEntity.ok(UpdateTaskResponse.fromEntity(taskService.updateTask(id, request)));
     }
 
     @DeleteMapping("/{id}")
