@@ -5,7 +5,7 @@ import com.example.TaskFlow.dtos.requests.projects.UpdateProjectRequest;
 import com.example.TaskFlow.entities.Project;
 import com.example.TaskFlow.entities.User;
 import com.example.TaskFlow.repositories.ProjectRepository;
-import com.example.TaskFlow.repositories.UserRespository;
+import com.example.TaskFlow.repositories.UserRepository;
 import com.example.TaskFlow.services.ProjectService;
 import com.example.TaskFlow.utils.EntityUtils;
 
@@ -22,7 +22,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserRespository userRespository;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -40,7 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Project createProject(CreateProjectRequest request) {
         Set<User> users = new HashSet<>();
         for (var id : request.userIds()) {
-            var user = EntityUtils.getByIdOrThrow(userRespository, id, "User");
+            var user = EntityUtils.getByIdOrThrow(userRepository, id, "User");
             users.add(user);
         }
 
@@ -59,7 +59,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (request.userIds() != null) {
             for (var userId : request.userIds()) {
-                var user = EntityUtils.getByIdOrThrow(userRespository, userId, "User");
+                var user = EntityUtils.getByIdOrThrow(userRepository, userId, "User");
                 users.add(user);
             }
             project.setUsers(users);

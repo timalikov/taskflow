@@ -1,6 +1,7 @@
 package com.example.TaskFlow.dtos.requests.tasks;
 
 import com.example.TaskFlow.enums.Priority;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +18,7 @@ public record CreateTaskRequest(
 
         Priority priority,
 
+        @FutureOrPresent
         LocalDateTime deadline,
 
         @NotNull(message = "User ID is required")

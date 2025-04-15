@@ -11,13 +11,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
+import java.util.List;
 
 
 @RestController
@@ -58,5 +56,17 @@ public class TaskController {
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/filtered")
+    public ResponseEntity<List<GetTaskResponse>> getTasksFiltered(
+            @RequestParam Long userId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String priority
+    ) {
+        return ResponseEntity.ok(taskService.getTasksFiltered(userId, status, priority)
+                .stream()
+                .map(GetTaskResponse::fromEntity)
+                .toList());
     }
 }

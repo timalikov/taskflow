@@ -4,7 +4,9 @@ import com.example.TaskFlow.entities.DocumentFile;
 import com.example.TaskFlow.exceptions.ResourceNotFoundException;
 import com.example.TaskFlow.properties.UploadProperties;
 import com.example.TaskFlow.repositories.DocumentFileRepository;
+import com.example.TaskFlow.repositories.TaskRepository;
 import com.example.TaskFlow.services.DocumentFileService;
+import com.example.TaskFlow.utils.EntityUtils;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.example.TaskFlow.exceptions.BadRequestException;
 
@@ -21,18 +23,23 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.TaskFlow.utils.EntityUtils.getByIdOrThrow;
+
 @Service
 @RequiredArgsConstructor
 public class DocumentFileServiceImpl implements DocumentFileService {
     private final GridFsTemplate gridFsTemplate;
     private final DocumentFileRepository documentFileRepository;
     private final UploadProperties uploadProperties;
+    private final TaskRepository taskRepository;
 
     @Override
     public DocumentFile saveDocument(Long id, MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             throw new BadRequestException("File is empty or null");
         }
+
+        getByIdOrThrow(taskRepository, id, "Task");
 
         var contentType = file.getContentType();
         if (!this.uploadProperties.getAllowedFileTypes().contains(contentType)) {
@@ -88,7 +95,7 @@ public class DocumentFileServiceImpl implements DocumentFileService {
     }
 
     private ObjectId parseObjectId(String id) {
-        if (!ObjectId.isValid(id)) throw new IllegalArgumentException("Invalid document id format");
+        if (!ObjectId.isValid(id)) throw new BadRequestException("Invalid document id format");
 
         return new ObjectId(id);
     }

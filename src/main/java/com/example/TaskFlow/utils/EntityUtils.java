@@ -9,4 +9,6 @@ public class EntityUtils {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("%s with id: %s not found".formatted(entityName, id)));
     }
+
+
 }
